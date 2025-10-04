@@ -1,0 +1,18 @@
+[build-system]
+requires = [
+    "setuptools >= 65",
+    "wheel >= 0.38",
+    "pyinstaller"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = []
+
+[project]
+name = "ctk-sidebar-nav"
+version = "0.1.0"
+dependencies = [
+    'pillow',
+    'customtkinter'
+]
