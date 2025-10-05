@@ -10,17 +10,22 @@ class CTkSidebarItem(CTk.CTkBaseClass):
     def __init__(self,
                  master,
                  theme : CTkSidebarTheme,
+                 id: Optional[int|str]=None,
                  text : str="",
                  width=200,
                  icon : Optional[Image.Image|tuple[CTk.CTkImage, CTk.CTkImage]]=None,
                  icon_size=(20,20),
                  has_submenu : bool = False,
-                 submenu_expanded : bool = True,):
+                 submenu_expanded : bool = True,
+                 override_text_x : Optional[int]=None,
+                 override_icon_x : Optional[int]=None,
+                ):
         bg_color = theme.bg_color
         super().__init__(master=master,
                          bg_color=bg_color,
                          width=width - resolve_padding(theme.padx, 0) - resolve_padding(theme.padx, 1),
                          height=theme.button_height)
+        self.id = id
         self._selected = False
         self._hover = False
         self._theme = theme
@@ -48,7 +53,8 @@ class CTkSidebarItem(CTk.CTkBaseClass):
         # Label text
         self._text_label = CTk.CTkLabel(self, text=text, text_color=theme.text_color, bg_color="transparent")
         text_offset = 0 if icon is None else icon_size[0] + theme.icon_text_margin
-        self._text_label.place(x=theme.text_indent + text_offset, anchor="w", rely=0.5)
+        text_x = self._get_text_x(icon_size if icon else None) if override_text_x is None else override_text_x
+        self._text_label.place(x=text_x, anchor="w", rely=0.5)
 
         # Hover handlers
         self._text_label.bind("<Enter>", self._on_enter)
@@ -72,7 +78,8 @@ class CTkSidebarItem(CTk.CTkBaseClass):
                 self.image = icon[0]
                 self.image_selected = icon[1]
             self._label_image = CTk.CTkLabel(self, text='', image=self.image, bg_color="transparent")
-            self._label_image.place(x=theme.text_indent, anchor="w", rely=0.5)
+            icon_x = self._get_icon_x(icon_size if icon else None) if override_icon_x is None else override_icon_x
+            self._label_image.place(x=icon_x, anchor="w", rely=0.5)
             self._label_image.bind("<Enter>", self._on_enter)
             self._label_image.bind("<Leave>", self._on_leave)
 
@@ -98,10 +105,10 @@ class CTkSidebarItem(CTk.CTkBaseClass):
         return colorized_image
 
     def bind_click(self, command):
-        self._canvas.bind("<Button-1>", command)
-        self._text_label.bind("<Button-1>", command)
+        self._canvas.bind("<Button-1>", self._on_click)
+        self._text_label.bind("<Button-1>", self._on_click)
         if self._label_image:
-            self._label_image.bind("<Button-1>", command)
+            self._label_image.bind("<Button-1>", self._on_click)
         self._click_commands.append(command)
 
     def bind_select(self, command):
@@ -136,15 +143,40 @@ class CTkSidebarItem(CTk.CTkBaseClass):
             self.submenu_expanded = False
             self._draw()
 
+    def _set_scaling(self, *args, **kwargs):
+        super()._set_scaling(*args, **kwargs)
+        self._canvas.configure(width=self._apply_widget_scaling(self._desired_width),
+                               height=self._apply_widget_scaling(self._desired_height))
+        self._draw(no_color_updates=True)
+
+    def _get_icon_x(self, icon_size: Optional[tuple[int, int]]) -> int:
+        if self._theme.label_align_ref == "icon":
+            # All buttons use the same icon x position, i.e. the indent of the theme
+            return self._theme.label_indent
+        else:
+            # The reference is the left position of the text
+            return self._theme.label_indent - icon_size[0] - self._theme.icon_text_margin
+        
+    def _get_text_x(self, icon_size: Optional[tuple[int, int]]) -> int:
+        if self._theme.label_align_ref == "icon":
+            # All buttons use the same icon x position, i.e. the indent of the theme
+            if icon_size is None:
+                return self._theme.label_indent
+            else:
+                return self._theme.label_indent + icon_size[0] + self._theme.icon_text_margin
+        else:
+            # The reference is the left position of the text
+            return self._theme.label_indent
+
     def _draw(self, no_color_updates=False, update_idletasks=True):
         super()._draw(no_color_updates)
         requires_recoloring = False
         if self.has_submenu: # Draw dropdown arrow if a submenu exists
-            requires_recoloring = self.draw_dropdown_arrow(self._apply_widget_scaling(self._current_width - (self._current_height / 2)),
+            requires_recoloring = self._draw_dropdown_arrow(self._apply_widget_scaling(self._current_width - (self._current_height / 2)),
                                                                       self._apply_widget_scaling(self._current_height / 2),
                                                                       self._apply_widget_scaling(8), self.submenu_expanded)
-            requires_recoloring |= self.draw_selected_submenu_marker()
-        requires_recoloring |= self._draw_engine.draw_rounded_rect_with_border(self._apply_widget_scaling(self._current_width), self._apply_widget_scaling(self._current_height), self._apply_widget_scaling(5), 0)
+            requires_recoloring |= self._draw_selected_submenu_marker()
+        requires_recoloring |= self._draw_engine.draw_rounded_rect_with_border(self._apply_widget_scaling(self._current_width), self._apply_widget_scaling(self._current_height), self._apply_widget_scaling(self._theme.button_corner_radius), 0)
 
         if no_color_updates is False or requires_recoloring:
             # Select the colors depending on the item's state
@@ -182,6 +214,11 @@ class CTkSidebarItem(CTk.CTkBaseClass):
         if update_idletasks:
             self._canvas.update_idletasks()
 
+    def _on_click(self, event):
+        for cmd in self._click_commands:
+            cmd()
+        return "break"
+
     def _on_enter(self, event):
         self._hover = True
         self._draw(update_idletasks=False)
@@ -215,7 +252,7 @@ class CTkSidebarItem(CTk.CTkBaseClass):
         else:
             return super().cget(attribute_name)
         
-    def draw_dropdown_arrow(self, x_position: Union[int, float], y_position: Union[int, float], size: Union[int, float], point_down : bool = True) -> bool:
+    def _draw_dropdown_arrow(self, x_position: Union[int, float], y_position: Union[int, float], size: Union[int, float], point_down : bool = True) -> bool:
         x_position, y_position, size = round(x_position), round(y_position), size
         requires_recoloring = False
 
@@ -243,17 +280,17 @@ class CTkSidebarItem(CTk.CTkBaseClass):
 
         return requires_recoloring
     
-    def draw_selected_submenu_marker(self) -> bool:
+    def _draw_selected_submenu_marker(self) -> bool:
         requires_recoloring = False
         if not self._canvas.find_withtag("submenu_marker"):
-            self._canvas.create_line(0, 0, 0, 0, tags="submenu_marker", width=self._apply_widget_scaling(3))
+            self._canvas.create_line(0, 0, 0, 0, tags="submenu_marker", width=self._apply_widget_scaling(self._theme.submenu_marker_thickness))
             self._canvas.tag_raise("submenu_marker")
             requires_recoloring = True
         self._canvas.coords("submenu_marker",
-                                   self._apply_widget_scaling(5),
-                                   self._apply_widget_scaling(5),
-                                   self._apply_widget_scaling(5),
-                                   self._apply_widget_scaling(self._current_height-5))
+                                   self._apply_widget_scaling(self._theme.submenu_marker_padx),
+                                   self._apply_widget_scaling(self._theme.submenu_marker_pady),
+                                   self._apply_widget_scaling(self._theme.submenu_marker_padx),
+                                   self._apply_widget_scaling(self._current_height-self._theme.submenu_marker_pady))
         return requires_recoloring
     
     def _resolve_fg_color(self, fg_color : str|list, bg_color : str|list) -> str:
@@ -304,6 +341,12 @@ class CTkSidebarSeparator(CTk.CTkBaseClass):
                         fill=line_color)
             self._canvas.configure(bg=self._apply_appearance_mode(self._bg_color))
         self._canvas.update_idletasks()
+
+    def _set_scaling(self, *args, **kwargs):
+        super()._set_scaling(*args, **kwargs)
+        self._canvas.configure(width=self._apply_widget_scaling(self._desired_width),
+                               height=self._apply_widget_scaling(self._desired_height))
+        self._draw(no_color_updates=True)
 
     def _draw_separator_line(self) -> bool:
         requires_recoloring = False
