@@ -4,7 +4,7 @@ import tkinter
 from PIL import Image
 import sys
 from .theme import CTkSidebarTheme
-from .util import resolve_padding
+from .util import resolve_padding, colorize_image, parse_tk_color
 
 class CTkSidebarItem(CTk.CTkBaseClass):
     def __init__(self,
@@ -66,11 +66,11 @@ class CTkSidebarItem(CTk.CTkBaseClass):
         self._label_image = None
         if icon:
             if isinstance(icon, Image.Image):
-                self.image = CTk.CTkImage(light_image=self._colorize_image(icon, theme.text_color, 'light'),
-                                        dark_image=self._colorize_image(icon, theme.text_color, 'dark'),
+                self.image = CTk.CTkImage(light_image=colorize_image(self, icon, theme.text_color, 'light'),
+                                        dark_image=colorize_image(self, icon, theme.text_color, 'dark'),
                                         size=icon_size)
-                self.image_selected = CTk.CTkImage(light_image=self._colorize_image(icon, theme.text_color_selected, 'light'),
-                                                dark_image=self._colorize_image(icon, theme.text_color_selected, 'dark'),
+                self.image_selected = CTk.CTkImage(light_image=colorize_image(self, icon, theme.text_color_selected, 'light'),
+                                                dark_image=colorize_image(self, icon, theme.text_color_selected, 'dark'),
                                                 size=icon_size)
             else:
                 if not isinstance(icon, tuple) or len(icon) != 2 or not all(isinstance(i, CTk.CTkImage) for i in icon):
@@ -82,27 +82,7 @@ class CTkSidebarItem(CTk.CTkBaseClass):
             self._label_image.place(x=icon_x, anchor="w", rely=0.5)
             self._label_image.bind("<Enter>", self._on_enter)
             self._label_image.bind("<Leave>", self._on_leave)
-
-    def _colorize_image(self, image: Image, color, appearance_mode : Literal['light', 'dark'] = 'light') -> Image:
-        if isinstance(color, list):
-            color = color[0] if appearance_mode == 'light' else color[1]
-        # Create a colored version for normal state
-        r, g, b = self._parse_tk_color(color)
-        
-        # Convert image to RGBA
-        img_rgba = image.convert("RGBA")
-        
-        # Create normal state image
-        normal_data = []
-        for item in img_rgba.getdata():
-            if item[3] > 0:  # If pixel is not fully transparent
-                normal_data.append((r, g, b, item[3]))
-            else:
-                normal_data.append(item)
-        
-        colorized_image = Image.new("RGBA", img_rgba.size)
-        colorized_image.putdata(normal_data)
-        return colorized_image
+        self._draw() # Initial draw
 
     def bind_click(self, command):
         self._canvas.bind("<Button-1>", self._on_click)
@@ -226,23 +206,6 @@ class CTkSidebarItem(CTk.CTkBaseClass):
     def _on_leave(self, event):
         self._hover = False
         self._draw(update_idletasks=False)
-
-    def _parse_tk_color(self, color):
-        # Tk Color to RGB tuple
-        try:
-            rgb = self.winfo_rgb(color)
-            return (rgb[0] // 256, rgb[1] // 256, rgb[2] // 256)
-        except Exception:
-            pass
-
-        # Handle hex colors
-        if color.startswith("#") and len(color) == 7:
-            r = int(color[1:3], 16)
-            g = int(color[3:5], 16)
-            b = int(color[5:7], 16)
-            return (r, g, b)
-
-        raise ValueError(f"Invalid color format: {color}")
     
     def cget(self, attribute_name: str) -> any:
         if attribute_name == "fg_color":
@@ -329,6 +292,7 @@ class CTkSidebarSeparator(CTk.CTkBaseClass):
                                 width=self._apply_widget_scaling(self._desired_width),
                                 height=self._apply_widget_scaling(self._desired_height))
         self._canvas.pack(fill="x", expand=True)
+        self._draw() # Initial draw
 
     def _draw(self, no_color_updates=False):
         super()._draw(no_color_updates)

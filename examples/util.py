@@ -130,7 +130,7 @@ def create_dashboard_view(master):
 
     for row_num, (_, order_id, customer, amount, checked) in enumerate(orders, start=1):
         # Checkbox
-        checkbox = customtkinter.CTkCheckBox(recent_orders_content, text="", width=30)
+        checkbox = customtkinter.CTkCheckBox(recent_orders_content, text="", width=30, checkbox_width=20, checkbox_height=20)
         checkbox.grid(row=row_num, column=0, padx=10, pady=(5, 5))
         if checked:
             checkbox.select()
