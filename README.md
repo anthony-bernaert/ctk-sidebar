@@ -1,9 +1,9 @@
 # Sidebar Control for CustomTkinter
 This is a custom widget that adds a sidebar to your CustomTkinter app and handles navigation.
 
-<img width="951" height="624" alt="CTkSidebar on macOS " src="https://github.com/user-attachments/assets/a5431186-93fa-410b-97e0-6a251ce0a7ce" />
+<img width="950" alt="CTkSidebar on macOS " src="https://github.com/user-attachments/assets/a5431186-93fa-410b-97e0-6a251ce0a7ce" />
 
-<img width="1008" height="675" alt="CTkSidebar on Windows" src="https://github.com/user-attachments/assets/9125a544-d606-4049-81b3-5d0c76ea9bd5" />
+<img width="950" alt="CTkSidebar on Windows" src="https://github.com/user-attachments/assets/9125a544-d606-4049-81b3-5d0c76ea9bd5" />
 
 ## Features
 - Modern look
@@ -67,6 +67,6 @@ app.mainloop()
 ```
 
 # Documentation
-Coming soon.
+See the [documentation](docs/DOCUMENTATION.md) page for a detailed description of this component.
 
-Also see the `/examples` folder.
+See the [examples](examples/) folder for the demo applications shown in the screenshots above.
