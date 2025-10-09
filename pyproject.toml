@@ -12,11 +12,12 @@ packages = ["ctksidebar"]
 
 [project]
 name = "ctk-sidebar"
-version = "0.2.0"
+version = "0.2.2"
 authors = [
     { name="Anthony Bernaert" }
 ]
 description = "A modern sidebar navigation control for CustomTkinter"
+readme = 'README.md'
 dependencies = [
     'pillow',
     'customtkinter'
