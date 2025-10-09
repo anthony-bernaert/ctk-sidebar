@@ -17,9 +17,9 @@ class CTkSidebar(CTk.CTkFrame):
         self._children : list[CTk.CTkBaseClass] = []
         self._indent_level = indent_level
         self._width : int|None = width
-        self._previous_item : Optional[CTkSidebarItem] = None
         self._single_expanded_submenu = single_expanded_submenu
         self.selected_item : Optional[CTkSidebarItem] = None
+        self._content = self
         if theme:
             self._theme = copy.copy(theme)
         else: # Use default theme if none is provided
@@ -45,6 +45,9 @@ class CTkSidebar(CTk.CTkFrame):
                  override_text_x: Optional[int]=None,
                  override_icon_x: Optional[int]=None
                 ) -> None:
+        if len(self._children) == 0 and not self._is_submenu and (pady := resolve_padding(self._theme.pady, 0)) > 0:
+            self.add_spacing(pady) # Add initial top padding
+
         ctk_item = CTkSidebarItem(self,
                                   theme=self._theme,
                                   id=id,
@@ -57,14 +60,8 @@ class CTkSidebar(CTk.CTkFrame):
                                   override_text_x=override_text_x,
                                   override_icon_x=override_icon_x
                                  )
-        if self._previous_item is not None:
-            # Adapt the padding of the previous item
-            pady = (resolve_padding(self._theme.pady, 0), 0) if len(self._children) == 1 else (0, 0)
-            self._previous_item.grid_configure(pady=pady)
-        pady = (resolve_padding(self._theme.pady, 0), 0) if len(self._children) == 0 else (0, resolve_padding(self._theme.pady, 1)) # First item, add top padding
-        self._previous_item = ctk_item
         self._children.append(ctk_item)
-        self._children[-1].grid(row=len(self._children)-1, column=0, sticky="ew", padx=self._theme.padx, pady=pady)
+        self._children[-1].grid(row=len(self._children)-1, column=0, sticky="ew", padx=self._theme.padx, pady=0)
 
         ctk_item.bind_click(lambda _=None, id=id: self._on_click(id))
         ctk_item.bind_click(lambda _=None, item=ctk_item: self._select_item(item))
@@ -84,6 +81,9 @@ class CTkSidebar(CTk.CTkFrame):
                     theme: Optional[CTkSidebarTheme]=None,
                     expanded: bool=True,
                    ) -> "CTkSidebar":
+        if len(self._children) == 0 and not self._is_submenu and (pady := resolve_padding(self._theme.pady, 0)) > 0:
+            self.add_spacing(pady)
+
         # Create an item on the current indentation level, with a dropdown
         ctk_item = CTkSidebarItem(self,
                                   theme=self._theme,
@@ -97,28 +97,23 @@ class CTkSidebar(CTk.CTkFrame):
                                   override_text_x=override_text_x,
                                   override_icon_x=override_icon_x
                                  )
-        if self._previous_item is not None:
-            # Adapt the padding of the previous item
-            pady = (resolve_padding(self._theme.pady, 0), 0) if len(self._children) == 1 else (0, 0)
-            self._previous_item.grid_configure(pady=pady)
-        pady = (resolve_padding(self._theme.pady, 0), 0) if len(self._children) == 0 else (0, resolve_padding(self._theme.pady, 1)) # First item, add top padding
-        self._previous_item = ctk_item
         self._children.append(ctk_item)
         self._children[-1].grid(row=len(self._children)-1, column=0, sticky="ew", padx=self._theme.padx, pady=0)
 
         # Create a new submenu with increased indentation level
         submenu_theme = theme if theme else CTkSidebarTheme(load_default='secondary')
-        submenu = CTkSidebar(self, width=self._width, theme=submenu_theme, indent_level=(self._indent_level + 1 if indent_level is None else indent_level))
+        wrapper = CTkSidebarSubmenu(self, width=self._width, theme=submenu_theme, indent_level=(self._indent_level + 1 if indent_level is None else indent_level))
+        submenu = wrapper.sidebar
         submenu._set_parent(self, ctk_item)
-        self._children.append(submenu)
+        self._children.append(wrapper)
         self._children[-1].grid(row=len(self._children)-1, column=0, sticky="ew", padx=0, pady=self._theme.submenu_pady)
-        ctk_item.bind_click(lambda _=None, item=ctk_item, submenu=submenu: self._toggle_submenu(item, submenu))
+        ctk_item.bind_click(lambda _=None, item=ctk_item, wrapper=wrapper: self._toggle_submenu(item, wrapper))
         ctk_item.bind_select(lambda _=None, item=ctk_item: self._select_item(item))
         ctk_item.bind_deselect(lambda _=None, submenu=submenu: submenu._deselect())
         if command:
             ctk_item.bind_click(lambda _=None, cmd=command, id=id: cmd(id))
         if not expanded:
-            submenu.hide()
+            wrapper.hide()
             ctk_item.collapse()
         self._on_add_item(id)
         return submenu
@@ -179,28 +174,19 @@ class CTkSidebar(CTk.CTkFrame):
         else:
             self._add_item_commands.append(command)
 
-    def _toggle_submenu(self, item : CTkSidebarItem, submenu : "CTkSidebar"):
-        item_index = self._children.index(item)
-        item_is_last = (item_index == len(self._children)-2) # -2 because the submenu is always the last child
+    def _toggle_submenu(self, item : CTkSidebarItem, submenu : "CTkSidebarSubmenu"):
         if item.submenu_expanded:
             item.collapse()
             submenu.hide()
-            if item_is_last:
-                top_pady = resolve_padding(self._theme.pady, 0) if len(self._children) == 2 else 0
-                bottom_pady = resolve_padding(self._theme.pady, 1)
-                item.grid(pady=(top_pady, bottom_pady))
         else:
             item.expand()
             submenu.show()
             if self._single_expanded_submenu:
                 # Collapse any other expanded submenu
                 for child in self._children:
-                    if isinstance(child, CTkSidebar) and child != submenu and child._visible:
+                    if isinstance(child, CTkSidebarSubmenu) and child != submenu and child._visible:
                         child.hide()
-                        child._parent_sidebar_item.collapse()
-            if item_is_last:
-                top_pady = resolve_padding(self._theme.pady, 0) if len(self._children) == 2 else 0
-                item.grid(pady=(top_pady, 0))
+                        child.sidebar._parent_sidebar_item.collapse()
         self._draw()
 
     def _on_add_item(self, id: Optional[str|int]=None):
@@ -211,9 +197,6 @@ class CTkSidebar(CTk.CTkFrame):
 
     def _draw(self, no_color_updates=False):
         super()._draw(no_color_updates)
-        if self._children:
-            for item in self._children:
-                item._draw(no_color_updates)
 
     def _on_click(self, id: Optional[str|int]=None):
         if self._parent_menu:
@@ -222,6 +205,13 @@ class CTkSidebar(CTk.CTkFrame):
             for cmd in self._change_commands:
                 cmd(id)
 
+class CTkSidebarSubmenu(CTk.CTkFrame):
+    def __init__(self, master=None, width: int=220, theme: CTkSidebarTheme=None, indent_level: int=0, single_expanded_submenu: bool=False):
+        super().__init__(master, width=width, corner_radius=0, fg_color=theme.bg_color)
+        self.sidebar = CTkSidebar(master=self, width=width, theme=theme, indent_level=indent_level, single_expanded_submenu=single_expanded_submenu)
+        self.sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=theme.pady)
+        self._visible = True
+    
     def _set_scaling(self, *args, **kwargs):
         super()._set_scaling(*args, **kwargs)
         if not self._visible:

@@ -52,7 +52,6 @@ class CTkSidebarItem(CTk.CTkBaseClass):
 
         # Label text
         self._text_label = CTk.CTkLabel(self, text=text, text_color=theme.text_color, bg_color="transparent")
-        text_offset = 0 if icon is None else icon_size[0] + theme.icon_text_margin
         text_x = self._get_text_x(icon_size if icon else None) if override_text_x is None else override_text_x
         self._text_label.place(x=text_x, anchor="w", rely=0.5)
 
