@@ -38,7 +38,7 @@ sidebar = CTkSidebar(master=parent)
 sidebar.pack(side="left", fill="y")
 ```
 
-## 3 API
+## 3 Sidebar API
 ### `CTkSidebarNavigation`
 The toplevel component to be instantiated on your window when needing a side bar with automatic navigation.
 
@@ -197,7 +197,7 @@ nav.set("home")
 
 Return type: `None`
 
-Add a new menu item to the side bar.
+Adds a new menu item to the side bar.
 
 As an icon you can either pass a PIL `Image.Image` or a `CTk.CTkImage`. When a PIL `Image.Image` is passed, the image automatically gets colorized to match the menu item text.
 If this behavior is not desired, you can pass your own tuple of `CTk.CTkImage`s to specify an image for the deselected and selected menu item state.
@@ -276,7 +276,7 @@ side.add_item(id="order_icon", text="Dashboard", icon=order_icon)
 
 ##### `.add_submenu(id, text, command, icon, icon_size, override_text_x, override_icon_x, indent_level, theme, expanded)`
 
-Add a menu item that has a submenu. Works similarly as `.add_item()`, except that it returns a new `CTkSidebar` object that allows you to populate the submenu.
+Adds a menu item that has a submenu. Works similarly as `.add_item()`, except that it returns a new `CTkSidebar` object that allows you to populate the submenu.
 
 Return type: `CTkSidebar`
 
@@ -449,4 +449,168 @@ Adds empty vertical space to the side bar.
 </table>
 
 ## 4 Styling
-TODO
+The default styling can be overridden by passing a `CTkSidebarTheme` object to the constructor of `CTkSidebarNavigation` and `CTkSidebar`. When creating a submenu using `CTkSidebar.add_submenu()`, a custom theme
+can be passed to override the style of the submenu.
+
+### CTkSidebarTheme
+
+#### Constructor
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>load_default</code></td>
+    <td><code>Literal['primary', 'secondary']</code></td>
+    <td>'primary'</td>
+    <td>Loads the default styles for all non-specified parameters. The primary default normally styles non-submenu items, whereas the secondary style is for submenus.</td>
+  </tr>
+  <tr>
+    <td><code>bg_color</code></td>
+    <td><code>Optional[str]</code></td>
+    <td>None</td>
+    <td>Background color of the sidebar.</td>
+  </tr>
+  <tr>
+    <td><code>padx</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Horizontal padding inside the sidebar frame.</td>
+  </tr>
+  <tr>
+    <td><code>pady</code></td>
+    <td><code>Optional[int|tuple[int,int]]</code></td>
+    <td>None</td>
+    <td>Vertical padding inside the sidebar frame.</td>
+  </tr>
+  <tr>
+    <td><code>submenu_pady</code></td>
+    <td><code>Optional[int|tuple[int,int]]</code></td>
+    <td>None</td>
+    <td>Vertical padding before and after submenu sections. If desired, you can specify a tuple for (top, bottom) padding.</td>
+  </tr>
+  <tr>
+    <td><code>button_color</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Background color of unselected sidebar buttons.</td>
+  </tr>
+  <tr>
+    <td><code>button_color_hover</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Background color when hovering over buttons.</td>
+  </tr>
+  <tr>
+    <td><code>button_color_selected</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Background color of the selected button.</td>
+  </tr>
+  <tr>
+    <td><code>button_corner_radius</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Corner radius of sidebar buttons.</td>
+  </tr>
+  <tr>
+    <td><code>button_height</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Height of sidebar buttons.</td>
+  </tr>
+  <tr>
+    <td><code>text_color</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Text color of unselected sidebar buttons.</td>
+  </tr>
+  <tr>
+    <td><code>text_color_hover</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Text color when hovering over buttons.</td>
+  </tr>
+  <tr>
+    <td><code>text_color_selected</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Text color of the selected button.</td>
+  </tr>
+  <tr>
+    <td><code>label_indent</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Base indentation for sidebar item labels.</td>
+  </tr>
+  <tr>
+    <td><code>label_indent_increment</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Additional indentation per submenu level.</td>
+  </tr>
+  <tr>
+    <td><code>label_align_ref</code></td>
+    <td><code>Optional[Literal['text', 'icon']]</code></td>
+    <td>None</td>
+    <td>Horizontally align labels of menu items by their text or icon left position.</td>
+  </tr>
+  <tr>
+    <td><code>icon_text_margin</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Horizontal margin between icon and text in sidebar items.</td>
+  </tr>
+  <tr>
+    <td><code>separator_line_color</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Color of separator lines.</td>
+  </tr>
+  <tr>
+    <td><code>separator_line_thickness</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Thickness of separator lines.</td>
+  </tr>
+  <tr>
+    <td><code>separator_height</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Total height of a separator item.</td>
+  </tr>
+  <tr>
+    <td><code>separator_width</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Width of the (centered) separator line.</td>
+  </tr>
+  <tr>
+    <td><code>separator_rounded_line_end</code></td>
+    <td><code>Optional[bool]</code></td>
+    <td>None</td>
+    <td>Whether separator lines have rounded or 'butt' ends.</td>
+  </tr>
+  <tr>
+    <td><code>submenu_marker_thickness</code></td>
+    <td><code>Optional[str|list[str]]</code></td>
+    <td>None</td>
+    <td>Thickness of the submenu expansion marker line.</td>
+  </tr>
+  <tr>
+    <td><code>submenu_marker_padx</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Horizontal offset of the submenu marker line with respect to the button's left edge.</td>
+  </tr>
+  <tr>
+    <td><code>submenu_marker_pady</code></td>
+    <td><code>Optional[int]</code></td>
+    <td>None</td>
+    <td>Vertical padding of the submenu marker line with respect to the button's top and bottom edges.</td>
+  </tr>
+</table>
