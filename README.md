@@ -1,4 +1,11 @@
 # Sidebar Control for CustomTkinter
+<p align="center">
+  <img alt="GitHub last commit" src="https://img.shields.io/github/v/release/anthony-bernaert/ctk-sidebar" />
+  <img alt="GitHub License" src="https://img.shields.io/github/license/anthony-bernaert/ctk-sidebar?color=blue" />
+  <img alt="GitHub Release" src="https://img.shields.io/github/last-commit/anthony-bernaert/ctk-sidebar" />
+</p>
+
+
 This is a custom widget that adds a sidebar to your CustomTkinter app and handles navigation.
 
 <img width="950" alt="CTkSidebar on macOS " src="https://github.com/user-attachments/assets/a5431186-93fa-410b-97e0-6a251ce0a7ce" />
