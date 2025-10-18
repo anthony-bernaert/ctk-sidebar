@@ -8,9 +8,8 @@
 
 This is a custom widget that adds a sidebar to your CustomTkinter app and handles navigation.
 
-<img width="950" alt="CTkSidebar on macOS " src="https://github.com/user-attachments/assets/a5431186-93fa-410b-97e0-6a251ce0a7ce" />
-
-<img width="950" alt="CTkSidebar on Windows" src="https://github.com/user-attachments/assets/9125a544-d606-4049-81b3-5d0c76ea9bd5" />
+<img width="950" alt="CTkSidebar on Windows" src="https://github.com/user-attachments/assets/0305cec3-dd06-41c6-a816-ec7a131687e6" />
+<img width="950" height="655" alt="CTkSidebar on macOS" src="https://github.com/user-attachments/assets/6a30f9a9-9b27-425a-a080-b704d1a39d7b" />
 
 ## Features
 - Modern look
