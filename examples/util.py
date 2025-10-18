@@ -55,7 +55,7 @@ def create_dashboard_view(master):
     dashboard_row1 = customtkinter.CTkFrame(master, fg_color="transparent")
     dashboard_row1.pack(anchor="nw", fill="x", pady=10)
     def dashboard_stat(master, title, icon, text, fg_color=None, text_color=None):
-        frame = customtkinter.CTkFrame(master, width=250, height=100, corner_radius=20, fg_color=fg_color)
+        frame = customtkinter.CTkFrame(master, width=250, height=100, corner_radius=10, fg_color=fg_color)
         label_icon = customtkinter.CTkLabel(frame, image=icon, text="", fg_color="transparent")
         label_icon.place(x=10, y=10, anchor="nw")
         label_title = customtkinter.CTkLabel(frame, text=title, text_color=text_color)
@@ -65,18 +65,18 @@ def create_dashboard_view(master):
         return frame
 
     dashboard_sales = dashboard_stat(dashboard_row1, "Sales", create_colorized_icon(get_asset_path("cart.png"), (255, 255, 255), (255, 255, 255), size=(35, 35)), "€ 15.300", fg_color=customtkinter.ThemeManager.theme["CTkButton"]["fg_color"], text_color=customtkinter.ThemeManager.theme["CTkButton"]["text_color"])
-    dashboard_sales.grid(row=0, column=0, padx=0, pady=10, sticky="we")
-    dashboard_customers = dashboard_stat(dashboard_row1, "Customers", create_colorized_icon(get_asset_path("user.png"), (20, 20, 20), (255, 255, 255), size=(35, 35)), "3.400")
-    dashboard_customers.grid(row=0, column=1, padx=10, pady=10, sticky="we")
-    dashboard_orders = dashboard_stat(dashboard_row1, "Orders", create_colorized_icon(get_asset_path("cart.png"), (20, 20, 20), (255, 255, 255), size=(35, 35)), "1.200")
-    dashboard_orders.grid(row=0, column=2, padx=0, pady=10, sticky="we")
+    dashboard_sales.grid(row=0, column=0, padx=0, pady=(10, 5), sticky="we")
+    dashboard_customers = dashboard_stat(dashboard_row1, "Customers", create_colorized_icon(get_asset_path("user.png"), (20, 20, 20), (255, 255, 255), size=(35, 35)), "962")
+    dashboard_customers.grid(row=0, column=1, padx=10, pady=(10, 5), sticky="we")
+    dashboard_orders = dashboard_stat(dashboard_row1, "Orders", create_colorized_icon(get_asset_path("cart.png"), (20, 20, 20), (255, 255, 255), size=(35, 35)), "1.235")
+    dashboard_orders.grid(row=0, column=2, padx=0, pady=(10, 5), sticky="we")
     dashboard_row1.grid_columnconfigure((0,1,2), weight=1)
 
     # Row 2 - Top Countries and Recent Orders
     dashboard_row2 = customtkinter.CTkFrame(master, fg_color="transparent")
-    dashboard_row2.pack(anchor="nw", fill="x", pady=(10, 0))
+    dashboard_row2.pack(anchor="nw", fill="x", pady=(0, 0))
 
-    countries_frame = customtkinter.CTkFrame(dashboard_row2, corner_radius=20)
+    countries_frame = customtkinter.CTkFrame(dashboard_row2, corner_radius=10)
     countries_frame.grid(row=0, column=0, padx=(0,10), sticky="nw")
     countries_title = customtkinter.CTkLabel(countries_frame, text="Top Countries", font=customtkinter.CTkFont(size=16, weight="bold"))
     countries_title.pack(padx=20, pady=(15,10), anchor="nw")
@@ -101,14 +101,12 @@ def create_dashboard_view(master):
     country3 = country_stat(countries_content, "The Netherlands", 200, 20)
     country3.pack(padx=10, pady=(0, 10), anchor="nw")
 
-    recent_orders_frame = customtkinter.CTkFrame(dashboard_row2, fg_color="transparent", corner_radius=20, border_width=2, border_color=customtkinter.ThemeManager.theme["CTkFrame"]["top_fg_color"])
-    recent_orders_frame.grid(row=0, column=1, padx=(10,0), sticky="nswe")
+    recent_orders_frame = customtkinter.CTkFrame(dashboard_row2, corner_radius=10)
+    recent_orders_frame.grid(row=0, column=1, padx=(2,0), sticky="nswe")
     recent_orders_title = customtkinter.CTkLabel(recent_orders_frame, text="Recent Orders", font=customtkinter.CTkFont(size=16, weight="bold"))
     recent_orders_title.pack(padx=20, pady=(15, 10), anchor="nw")
-    recent_orders_clear_button = customtkinter.CTkButton(recent_orders_frame, text="Clear", width=60)
-    recent_orders_clear_button.place(relx=1.0, x=-15, y=15, anchor="ne")
     recent_orders_content = customtkinter.CTkFrame(recent_orders_frame, 
-                                                   corner_radius=15,
+                                                   fg_color="transparent", corner_radius=0
                                                    )
     recent_orders_content.pack(anchor="nw", padx=15, pady=(0,15), fill="both", expand=True)
 
@@ -130,7 +128,7 @@ def create_dashboard_view(master):
 
     for row_num, (_, order_id, customer, amount, checked) in enumerate(orders, start=1):
         # Checkbox
-        checkbox = customtkinter.CTkCheckBox(recent_orders_content, text="", width=30, checkbox_width=20, checkbox_height=20)
+        checkbox = customtkinter.CTkCheckBox(recent_orders_content, text="", width=16, checkbox_width=16, checkbox_height=16, border_width=2, corner_radius=4)
         checkbox.grid(row=row_num, column=0, padx=10, pady=(5, 5))
         if checked:
             checkbox.select()
@@ -159,7 +157,7 @@ def create_dashboard_view(master):
 
     # Row 3 - Settings
     dashboard_row3 = customtkinter.CTkFrame(master, fg_color="transparent")
-    dashboard_row3.pack(anchor="nw", fill="x", pady=(20, 0))
+    dashboard_row3.pack(anchor="nw", fill="x", pady=(15, 0))
 
     # Display Scale
     scale_label = customtkinter.CTkLabel(dashboard_row3, text="UI Scale:")
@@ -176,10 +174,10 @@ def create_dashboard_view(master):
     appearance_var = customtkinter.StringVar(value="System")
     appearance_menu = customtkinter.CTkOptionMenu(dashboard_row3, values=appearance_options, variable=appearance_var,
                                                 command=lambda value: customtkinter.set_appearance_mode(value.lower()))
-    appearance_menu.pack(padx=10, pady=10, anchor="w", side="right")
-    appearance_label.pack(anchor="w", padx=(20, 10), pady=10, side="right")
-    scale_menu.pack(padx=10, pady=10, anchor="w", side="right")
-    scale_label.pack(anchor="w", padx=(0, 10), pady=10, side="right")
+    appearance_menu.pack(padx=(10, 0), pady=(10, 0), anchor="w", side="right")
+    appearance_label.pack(anchor="w", padx=(20, 10), pady=(10, 0), side="right")
+    scale_menu.pack(padx=10, pady=(10, 0), anchor="w", side="right")
+    scale_label.pack(anchor="w", padx=(0, 10), pady=(10, 0), side="right")
 
     # Configure the grid
     dashboard_row3.grid_columnconfigure((0, 2), weight=0)

@@ -7,7 +7,7 @@ from util import create_dashboard_view, get_asset_path
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 app = customtkinter.CTk()
-app.geometry("840x570")
+app.geometry("790x545")
 app.title("CTkSidebar Example - Basic")
 
 # Create a navigation container filling the window
