@@ -3,3 +3,5 @@
 __pycache__
 *.whl
 dist/
+.venv*
+dist_*

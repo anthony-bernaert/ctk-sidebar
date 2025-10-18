@@ -1,19 +1,19 @@
-from typing import Literal, Optional, Union
+from typing import Optional, Union
 import customtkinter as CTk
 import tkinter
 from PIL import Image
 import sys
 from .theme import CTkSidebarTheme
-from .util import resolve_padding, colorize_image, parse_tk_color
+from .util import resolve_padding, colorize_image
 
 class CTkSidebarItem(CTk.CTkBaseClass):
     def __init__(self,
                  master,
                  theme : CTkSidebarTheme,
-                 id: Optional[int|str]=None,
+                 id: Optional[Union[int, str]]=None,
                  text : str="",
                  width=200,
-                 icon : Optional[Image.Image|tuple[CTk.CTkImage, CTk.CTkImage]]=None,
+                 icon : Optional[Union[Image.Image, tuple[CTk.CTkImage, CTk.CTkImage]]]=None,
                  icon_size=(20,20),
                  has_submenu : bool = False,
                  submenu_expanded : bool = True,
@@ -254,8 +254,8 @@ class CTkSidebarItem(CTk.CTkBaseClass):
                                    self._apply_widget_scaling(self._theme.submenu_marker_padx),
                                    self._apply_widget_scaling(self._current_height-self._theme.submenu_marker_pady))
         return requires_recoloring
-    
-    def _resolve_fg_color(self, fg_color : str|list, bg_color : str|list) -> str:
+
+    def _resolve_fg_color(self, fg_color : Union[str, list], bg_color : Union[str, list]) -> str:
             resolved_fg = self._apply_appearance_mode(fg_color)
             resolved_bg = self._apply_appearance_mode(bg_color)
             if resolved_fg == "transparent":
@@ -266,11 +266,11 @@ class CTkSidebarItem(CTk.CTkBaseClass):
 class CTkSidebarSeparator(CTk.CTkBaseClass):
     def __init__(self,
                  master,
-                 bg_color : str|list,
+                 bg_color : Union[str, list],
                  width : int,
                  height : int,
                  line_length : int,
-                 line_color : str|list,
+                 line_color : Union[str, list],
                  line_thickness : int,
                  rounded_line_end : bool = False
                 ):

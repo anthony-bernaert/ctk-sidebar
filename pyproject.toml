@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools >= 65",
+    "setuptools >= 58",
     "wheel >= 0.38",
     "pyinstaller"
 ]
@@ -12,7 +12,7 @@ packages = ["ctksidebar"]
 
 [project]
 name = "ctk-sidebar"
-version = "0.2.2"
+version = "0.2.3"
 authors = [
     { name="Anthony Bernaert" }
 ]

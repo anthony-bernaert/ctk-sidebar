@@ -1,8 +1,8 @@
-from typing import Literal
+from typing import Literal, Union, Tuple
 from PIL import Image
 import customtkinter as CTk
 
-def resolve_padding(padding: int|tuple[int, int], index: int) -> int:
+def resolve_padding(padding: Union[int, Tuple[int, int]], index: int) -> int:
     if isinstance(padding, int):
         return padding
     elif isinstance(padding, tuple) and len(padding) == 2:  
@@ -10,7 +10,7 @@ def resolve_padding(padding: int|tuple[int, int], index: int) -> int:
     else:
         raise ValueError("Padding must be an int or a tuple of two ints")
 
-def colorize_image(master: CTk.CTkBaseClass, image: Image, color, appearance_mode : Literal['light', 'dark'] = 'light') -> Image:
+def colorize_image(master: CTk.CTkBaseClass, image: Image, color, appearance_mode: Literal['light', 'dark'] = 'light') -> Image:
     if isinstance(color, list):
         color = color[0] if appearance_mode == 'light' else color[1]
     # Create a colored version for normal state

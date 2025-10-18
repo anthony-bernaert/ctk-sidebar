@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 import customtkinter as CTk
 import copy
 from .util import resolve_padding
@@ -7,16 +7,16 @@ from .item import CTkSidebarItem, CTkSidebarSeparator
 from PIL import Image
 
 class CTkSidebar(CTk.CTkFrame):
-    def __init__(self, master=None, width: int=220, theme: CTkSidebarTheme=None, indent_level: int=0, single_expanded_submenu: bool=False):
-        self._change_commands : list[Callable[[Optional[str|int]], None]] = []
-        self._add_item_commands : list[Callable[[Optional[str|int]], None]] = []
+    def __init__(self, master=None, width: int=220, theme: Optional[CTkSidebarTheme]=None, indent_level: int=0, single_expanded_submenu: bool=False):
+        self._change_commands : list[Callable[[Optional[Union[str, int]]], None]] = []
+        self._add_item_commands : list[Callable[[Optional[Union[str, int]]], None]] = []
         self._visible = True
         self._is_submenu = False
         self._parent_sidebar_item = None
         self._parent_menu = None
         self._children : list[CTk.CTkBaseClass] = []
         self._indent_level = indent_level
-        self._width : int|None = width
+        self._width : Optional[int] = width
         self._single_expanded_submenu = single_expanded_submenu
         self.selected_item : Optional[CTkSidebarItem] = None
         self._content = self
@@ -32,15 +32,15 @@ class CTkSidebar(CTk.CTkFrame):
         self._parent_menu = parent_menu
         self._parent_sidebar_item = parent_item
     
-    def add_frame(self, frame: CTk.CTkBaseClass, pady: Optional[int|tuple[int,int]]=None) -> None:
+    def add_frame(self, frame: CTk.CTkBaseClass, pady: Optional[Union[int, tuple[int,int]]]=None) -> None:
         self._children.append(frame)
         self._children[-1].grid(row=len(self._children)-1, column=0, sticky="ew", padx=self._theme.padx, pady=pady if pady is not None else 0)
 
     def add_item(self,
-                 id : Optional[int|str]=None,
+                 id : Optional[Union[int, str]]=None,
                  text: str="",
-                 command: Optional[Callable[[int|str], None]]=None,
-                 icon: Optional[Image.Image|tuple[CTk.CTkImage, CTk.CTkImage]]=None,
+                 command: Optional[Callable[[Union[int, str]], None]]=None,
+                 icon: Optional[Union[Image.Image, tuple[CTk.CTkImage, CTk.CTkImage]]]=None,
                  icon_size : tuple[int, int]=(20,20),
                  override_text_x: Optional[int]=None,
                  override_icon_x: Optional[int]=None
@@ -70,10 +70,10 @@ class CTkSidebar(CTk.CTkFrame):
         self._on_add_item(id)
 
     def add_submenu(self, 
-                    id : Optional[int|str]=None,
+                    id : Optional[Union[int, str]]=None,
                     text: str="",
-                    command: Optional[Callable[[int|str], None]]=None,
-                    icon: Optional[Image.Image|tuple[CTk.CTkImage, CTk.CTkImage]]=None,
+                    command: Optional[Callable[[Union[int, str]], None]]=None,
+                    icon: Optional[Union[Image.Image, tuple[CTk.CTkImage, CTk.CTkImage]]]=None,
                     icon_size : tuple[int, int]=(20,20),
                     override_text_x: Optional[int]=None,
                     override_icon_x: Optional[int]=None,
@@ -121,7 +121,7 @@ class CTkSidebar(CTk.CTkFrame):
     def add_separator(self,
                       width: Optional[int]=None,
                       height: Optional[int]=None,
-                      line_color: Optional[str|list[str]]=None,
+                      line_color: Optional[Union[str, list[str]]]=None,
                       line_thickness: Optional[int]=None,
                       rounded_line_end: Optional[bool]=None,
                      ) -> None:
@@ -152,7 +152,7 @@ class CTkSidebar(CTk.CTkFrame):
             self.selected_item.deselect()
         self.selected_item = None
 
-    def get_item(self, id: int|str) -> Optional[CTkSidebarItem]:
+    def get_item(self, id: Union[int, str]) -> Optional[CTkSidebarItem]:
         for child in self._children:
             if isinstance(child, CTkSidebarItem):
                 if child.id == id:
@@ -162,13 +162,13 @@ class CTkSidebar(CTk.CTkFrame):
                     return sub_item
         return None
 
-    def bind_change(self, command: Callable[[Optional[str|int]], None], overwrite: bool=False):
+    def bind_change(self, command: Callable[[Optional[Union[str, int]]], None], overwrite: bool=False):
         if overwrite:
             self._change_commands = [command]
         else:
             self._change_commands.append(command)
 
-    def bind_add_item(self, command: Callable[[Optional[str|int]], None], overwrite: bool=False):
+    def bind_add_item(self, command: Callable[[Optional[Union[str, int]]], None], overwrite: bool=False):
         if overwrite:
             self._add_item_commands = [command]
         else:
@@ -189,7 +189,7 @@ class CTkSidebar(CTk.CTkFrame):
                         child.sidebar._parent_sidebar_item.collapse()
         self._draw()
 
-    def _on_add_item(self, id: Optional[str|int]=None):
+    def _on_add_item(self, id: Optional[Union[str, int]]=None):
         if self._parent_menu:
             self._parent_menu._on_add_item(id)
         for callback in self._add_item_commands:
@@ -198,7 +198,7 @@ class CTkSidebar(CTk.CTkFrame):
     def _draw(self, no_color_updates=False):
         super()._draw(no_color_updates)
 
-    def _on_click(self, id: Optional[str|int]=None):
+    def _on_click(self, id: Optional[Union[str, int]]=None):
         if self._parent_menu:
             self._parent_menu._on_click(id)
         else:

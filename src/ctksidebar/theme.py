@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, Union, Tuple, List
 import customtkinter as CTk
 
 class CTkSidebarTheme:
@@ -6,26 +6,26 @@ class CTkSidebarTheme:
                  load_default: Literal['primary', 'secondary']='primary',
                  bg_color: Optional[str]=None,
                  padx: Optional[int]=None,
-                 pady: Optional[int|tuple[int,int]]=None,
-                 submenu_pady: Optional[int|tuple[int,int]]=None,
-                 button_color: Optional[str|list[str]]=None,
-                 button_color_hover: Optional[str|list[str]]=None,
-                 button_color_selected: Optional[str|list[str]]=None,
+                 pady: Optional[Union[int, Tuple[int, int]]]=None,
+                 submenu_pady: Optional[Union[int, Tuple[int, int]]]=None,
+                 button_color: Optional[Union[str, List[str]]]=None,
+                 button_color_hover: Optional[Union[str, List[str]]]=None,
+                 button_color_selected: Optional[Union[str, List[str]]]=None,
                  button_corner_radius: Optional[int]=None,
                  button_height: Optional[int]=None,
-                 text_color: Optional[str|list[str]]=None,
-                 text_color_hover: Optional[str|list[str]]=None,
-                 text_color_selected: Optional[str|list[str]]=None,
+                 text_color: Optional[Union[str, List[str]]]=None,
+                 text_color_hover: Optional[Union[str, List[str]]]=None,
+                 text_color_selected: Optional[Union[str, List[str]]]=None,
                  label_indent: Optional[int]=None,
                  label_indent_increment: Optional[int]=None,
                  label_align_ref: Optional[Literal['text', 'icon']]=None,
                  icon_text_margin: Optional[int]=None,
-                 separator_line_color: Optional[str|list[str]]=None,
+                 separator_line_color: Optional[Union[str, List[str]]]=None,
                  separator_line_thickness: Optional[int]=None,
                  separator_height: Optional[int]=None,
                  separator_width: Optional[int]=None,
                  separator_rounded_line_end: Optional[bool]=None,
-                 submenu_marker_thickness: Optional[str|list[str]]=None,
+                 submenu_marker_thickness: Optional[Union[str, List[str]]]=None,
                  submenu_marker_padx: Optional[int]=None,
                  submenu_marker_pady: Optional[int]=None,
                 ):
